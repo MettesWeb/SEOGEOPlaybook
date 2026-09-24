@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Screaming Frog & Sistrix Playbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--ink:#14262b;--mute:#5a6d72;--line:#d6e0de;--frog:#237a4b;--frogbg:#e2f3e9;--sis:#2456a6;--sisbg:#e3ebf8;--warn:#a5410f;--warnbg:#fbeadd;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1d;--card:#16262a;--ink:#e6efee;--mute:#9db0b3;--line:#2b4046;--frog:#5cc88b;--frogbg:#183a29;--sis:#7fa9ec;--sisbg:#182b4a;--warn:#f0a070;--warnbg:#3d2617}}
+:root[data-theme="dark"]{--bg:#0f1a1d;--card:#16262a;--ink:#e6efee;--mute:#9db0b3;--line:#2b4046;--frog:#5cc88b;--frogbg:#183a29;--sis:#7fa9ec;--sisbg:#182b4a;--warn:#f0a070;--warnbg:#3d2617}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+header{padding:28px 20px 8px;max-width:920px;margin:0 auto}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0 0 8px}
+header p{margin:0;color:var(--mute);max-width:60ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line);margin-top:16px}
+nav div{max-width:920px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:10px 16px}
+nav button{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--sis);outline-offset:2px}
+main{max-width:920px;margin:0 auto;padding:8px 16px 60px}
+section[hidden]{display:none}
+h2{font-size:26px;margin:28px 0 6px}
+h3{font-size:19px;margin:22px 0 6px}
+p{margin:8px 0;max-width:68ch}
+.lead{font-size:19px}
+.tip{border-left:5px solid var(--frog);background:var(--frogbg);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.tip.s{border-color:var(--sis);background:var(--sisbg)}
+.tip.w{border-color:var(--warn);background:var(--warnbg)}
+.chain{display:flex;gap:0;overflow-x:auto;margin:16px 0;padding-bottom:6px}
+.chain>div{flex:1 0 128px;background:var(--card);border:1px solid var(--line);padding:12px;margin-right:-1px}
+.chain>div:first-child{border-radius:12px 0 0 12px}.chain>div:last-child{border-radius:0 12px 12px 0}
+.chain b{display:block}.chain small{color:var(--mute);display:block;margin:2px 0 8px;line-height:1.3}
+.tag{display:inline-block;font-size:13px;padding:1px 8px;border-radius:6px;margin:2px 2px 0 0}
+.tag.f{background:var(--frogbg);color:var(--frog)}.tag.s{background:var(--sisbg);color:var(--sis)}.tag.g{background:var(--line);color:var(--ink)}
+.tblw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;min-width:560px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;font-size:16px}
+th{background:var(--bg)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 16px}
+summary{cursor:pointer;padding:12px 0;font-weight:700}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+details ul,details ol{margin:6px 0 12px;padding-left:22px}
+details.f>summary{color:var(--frog)}details.s>summary{color:var(--sis)}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;position:relative;padding:4px 0 12px 46px}
+.steps li:before{content:counter(s);position:absolute;left:0;top:2px;width:32px;height:32px;border-radius:50%;background:var(--frog);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.sis .steps li:before{background:var(--sis)}
+code,.copy{font-family:ui-monospace,Consolas,monospace;font-size:15px;background:var(--line);padding:1px 6px;border-radius:5px}
+.copy{display:block;padding:12px;margin:8px 0;white-space:pre-wrap;border-radius:10px}
+.scale{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.scale div{flex:1 1 200px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.scale strong{font-size:24px;color:var(--sis)}
+</style>
+</head>
+<body>
+<header>
+<h1>Screaming Frog & Sistrix – das Anfänger-Playbook</h1>
+<p>Zum Nachschlagen und Verstehen: erst das Gesamtbild, dann jedes Tool Schritt für Schritt, dann wie beide zusammenspielen. Basis: Vorlesung „Tools für SEO & GEO“ und SEO-Basics-Playbook.</p>
+</header>
+<nav><div role="tablist" id="tabs"></div></nav>
+<main>
+
+<section id="bild" data-t="1 · Gesamtbild">
+<h2>Das Gesamtbild in 2 Minuten</h2>
+<p class="lead">Damit eine Seite bei Google (oder in einer KI-Antwort) auftaucht, muss sie eine Kette durchlaufen. <b>Jedes Tool schaut auf ein anderes Stück dieser Kette.</b> Genau das ist der Zusammenhang, der in der Vorlesung fehlt.</p>
+<div class="chain">
+<div><b>1. Entdecken</b><small>Google findet die URL über Links & Sitemap</small><span class="tag f">Frog</span><span class="tag g">GSC</span></div>
+<div><b>2. Crawlen</b><small>Ein Bot ruft die Seite ab (wenn nicht blockiert)</small><span class="tag f">Frog</span><span class="tag g">GSC</span></div>
+<div><b>3. Indexieren</b><small>Google nimmt die Seite in seinen „Katalog“ auf</small><span class="tag f">Frog</span><span class="tag g">GSC</span></div>
+<div><b>4. Ranken</b><small>Für eine Suche wird eine Position vergeben</small><span class="tag s">Sistrix</span><span class="tag g">GSC</span></div>
+<div><b>5. Klick / Zitat</b><small>Besuch – oder Nennung in der KI-Antwort</small><span class="tag s">Sistrix (KI)</span><span class="tag g">GA4</span></div>
+</div>
+<div class="tip"><b>Eselsbrücke:</b> <b>Screaming Frog = TÜV von innen.</b> Er prüft deine Seite wie ein Google-Bot und findet technische Mängel. <b>Sistrix = Marktforschung von außen.</b> Er misst, wie sichtbar du bei Google bist, verglichen mit Konkurrenten.</div>
+<div class="tip w"><b>Wichtig:</b> „Gecrawlt“ heißt nicht „indexiert“, und „indexiert“ heißt nicht „gutes Ranking“. Diese drei Ebenen immer getrennt prüfen.</div>
+<h3>Die vier Tools im Überblick</h3>
+<div class="tblw"><table>
+<tr><th>Tool</th><th>Frage, die es beantwortet</th><th>Blick</th><th>Kosten</th></tr>
+<tr><td><b>Screaming Frog</b></td><td>Ist meine Website technisch sauber lesbar? (kaputte Links, Titles, Weiterleitungen …)</td><td>Von innen, wie ein Bot</td><td>Free: bis 500 URLs</td></tr>
+<tr><td><b>Sistrix</b></td><td>Wie sichtbar bin ich bei Google – und im Vergleich zur Konkurrenz?</td><td>Von außen, Markt</td><td>Zugang über Vorlesung klären</td></tr>
+<tr><td><b>Google Search Console</b></td><td>Was sieht Google wirklich bei mir? Klicks, Impressionen, Indexierung</td><td>Googles eigene Daten</td><td>Kostenlos</td></tr>
+<tr><td><b>Google Analytics 4</b></td><td>Was tun Besucher auf meiner Seite?</td><td>Nach dem Klick</td><td>Kostenlos</td></tr>
+</table></div>
+<h3>Warum das auch für GEO zählt</h3>
+<p>Nur was gefunden, verstanden und sauber ausgelesen werden kann, wird in Rankings berücksichtigt <i>und</i> in KI-Antworten (z. B. „Übersichten mit KI“) zitiert. Technisches SEO ist also ein indirekter Hebel für GEO. Sistrix hilft zusätzlich zu sehen, ob Inhalte in Googles KI-Antworten auftauchen.</p>
+</section>
+
+<section id="begriffe" data-t="2 · Begriffe" hidden>
+<h2>Begriffe, die ihr für beide Tools braucht</h2>
+<p>Aufklappen, wenn ein Wort unklar ist. Alle Erklärungen sind bewusst einfach gehalten.</p>
+<details><summary>Crawler / Bot / Spider</summary><p>Ein Programm, das Websites Seite für Seite besucht und Daten sammelt. Googles Bot tut das für die Suche, Screaming Frog tut es für euch, um zu prüfen, was der Bot sehen würde.</p></details>
+<details><summary>Index</summary><p>Googles riesiger „Katalog“ aller aufgenommenen Seiten. Was nicht im Index steht, taucht in der Suche nicht auf.</p></details>
+<details><summary>SERP</summary><p>Search Engine Results Page: die Ergebnisseite bei Google. Dort stehen normale Treffer, aber auch Extras wie „Übersichten mit KI“ (SERP-Features).</p></details>
+<details><summary>Statuscodes: 200, 301, 302, 404, 5xx</summary>
+<ul><li><b>200</b> = alles gut, Seite erreichbar.</li><li><b>301</b> = dauerhafte Weiterleitung („umgezogen“).</li><li><b>302</b> = vorübergehende Weiterleitung.</li><li><b>404</b> = Seite nicht gefunden (toter Link).</li><li><b>5xx</b> = Serverfehler, schnell beheben.</li></ul></details>
+<details><summary>Redirect-Kette</summary><p>Seite A leitet auf B, B auf C. Besser: intern direkt auf das Ziel C verlinken.</p></details>
+<details><summary>Title-Tag & Meta Description</summary><p>Der Title ist die blaue Überschrift im Suchergebnis (sollte einzigartig und klar sein). Die Meta Description ist der Beschreibungstext darunter, ein Klickanreiz. Google darf einen anderen Text wählen.</p></details>
+<details><summary>H1, H2, H3</summary><p>Überschriften auf der Seite. H1 = Hauptthema der Seite (pro Seite eine klare), H2/H3 = Unterthemen.</p></details>
+<details><summary>Canonical</summary><p>Hinweis „Das ist die bevorzugte Version dieser Seite“, wichtig bei doppelten oder sehr ähnlichen Inhalten.</p></details>
+<details><summary>noindex & robots.txt</summary><p><b>robots.txt</b> steuert, was Bots <i>crawlen</i> dürfen. <b>noindex</b> verhindert, dass eine Seite <i>indexiert</i> wird. Nicht verwechseln: Blockiert robots.txt eine Seite, kann der Bot ein noindex dort evtl. gar nicht lesen.</p></details>
+<details><summary>XML-Sitemap</summary><p>Eine Liste der URLs, die Suchmaschinen finden sollen. Sie sollte nur Seiten enthalten, die ihr wirklich im Index sehen wollt.</p></details>
+<details><summary>hreflang</summary><p>Code, der Google sagt, für welche Sprache/Region eine Seite gedacht ist. Nur bei mehrsprachigen Websites relevant.</p></details>
+<details><summary>Domain, Verzeichnis, URL</summary><p>Domain = <code>beispiel.de</code>. Verzeichnis = Bereich wie <code>/blog/</code>. URL = die genaue Adresse einer Seite.</p></details>
+<details><summary>Keyword, Ranking, Impression, CTR</summary><p>Keyword = Suchbegriff. Ranking = Position im Ergebnis. Impression = Einblendung. CTR = Klicks ÷ Impressionen.</p></details>
+<details><summary>Zero-Click, AI Overviews, GEO</summary><p>Bei AI Overviews (Übersichten mit KI) und KI-Modus bekommen Nutzer die Antwort oft ohne Klick. Wirkung entsteht dann schon beim Lesen der Antwort. GEO (Generative Engine Optimization) = Inhalte so gestalten, dass KI-Systeme sie verstehen und zitieren.</p></details>
+</section>
+
+<section id="frog" data-t="3 · Screaming Frog" hidden>
+<h2 style="color:var(--frog)">Screaming Frog SEO Spider</h2>
+<p class="lead">Ein Crawler, der eure Website so „liest“, wie Google es tun würde, und alle technischen Auffälligkeiten in Tabellen sammelt. Die Free-Version crawlt bis zu 500 URLs, das reicht für kleine Websites.</p>
+<h3>So startet ihr (Free-Version)</h3>
+<ol class="steps">
+<li><b>Herunterladen & installieren</b> von der offiziellen Screaming-Frog-Website (Free-Version reicht).</li>
+<li><b>Programm öffnen</b> und oben in das Feld „Enter URL to spider“ die Adresse eurer Website eintragen, z. B. <code>https://beispiel.de</code>.</li>
+<li><b>Auf „Start“ klicken.</b> Der Fortschrittsbalken läuft, bis alle (bis zu 500) URLs besucht sind.</li>
+<li><b>Ergebnisse lesen:</b> Oben findet ihr Reiter (Tabs), rechts eine Übersicht mit Filtern. Klickt einen Reiter an und wählt im Filter z. B. „Missing“ oder „Client Error (4xx)“.</li>
+<li><b>Exportieren:</b> Mit „Export“ speichert ihr die aktuelle Tabelle als CSV/Excel für euer Dokument.</li>
+</ol>
+<div class="tip w">Menünamen können sich je nach Version leicht unterscheiden. Wenn etwas anders heißt, sucht den Reiter mit dem gleichen Thema.</div>
+<h3>Reiter-Landkarte: Was zeigt welcher Reiter?</h3>
+<div class="tblw"><table>
+<tr><th>Reiter</th><th>Einfach erklärt</th><th>Beispiel-Ergebnis</th></tr>
+<tr><td>Internal</td><td>Alle Seiten eurer Website in einer Liste, mit Statuscode und Indexierbarkeit</td><td>„180 Seiten gefunden“</td></tr>
+<tr><td>Response Codes</td><td>Statuscodes: 200, 301/302, 404, 5xx</td><td>„12 interne Links führen ins Leere (404)“</td></tr>
+<tr><td>Page Titles</td><td>Title-Tags: fehlt, doppelt, zu lang?</td><td>„15 Seiten ohne Title“</td></tr>
+<tr><td>Meta Description</td><td>Beschreibungstexte: leer, doppelt, zu lang?</td><td>„40 Seiten ohne Beschreibung“</td></tr>
+<tr><td>H1 / H2</td><td>Überschriften-Struktur</td><td>„8 Seiten ohne H1“</td></tr>
+<tr><td>Images</td><td>Bilder, Größe, fehlende Alt-Texte</td><td>„25 Bilder ohne Alt-Text“</td></tr>
+<tr><td>Canonicals / Directives</td><td>Bevorzugte URL und noindex-Anweisungen</td><td>„Wichtige Seite steht auf noindex“</td></tr>
+<tr><td>Hreflang</td><td>Sprach-/Länderzuordnung (nur mehrsprachig)</td><td>„Hreflang auf Startseite fehlt“</td></tr>
+</table></div>
+<h3>Problem-Landkarte: Was tue ich mit dem Ergebnis?</h3>
+<details class="f"><summary>Problem 1: Tote Links (404)</summary><p><b>Erkennen:</b> Response Codes → Filter „Client Error (4xx)“.</p><p><b>Prüfen:</b> Unten im Detailfenster „Inlinks“ zeigt, <i>welche Seiten</i> auf die tote URL verlinken.</p><p><b>Lösen:</b> Link korrigieren oder eine 301-Weiterleitung auf die passende neue Seite einrichten.</p></details>
+<details class="f"><summary>Problem 2: Weiterleitungen chaotisch</summary><p><b>Erkennen:</b> Response Codes → Filter „Redirection (3xx)“.</p><p><b>Prüfen:</b> Gibt es Ketten A → B → C oder doppelte Redirects? Ist es dauerhaft (301) oder vorübergehend (302)?</p><p><b>Lösen:</b> Direkt auf die finale URL verlinken, dauerhafte Umzüge mit 301.</p></details>
+<details class="f"><summary>Problem 3: Title oder Beschreibung fehlt / doppelt / zu lang</summary><p><b>Erkennen:</b> Reiter „Page Titles“ bzw. „Meta Description“, Filter „Missing“, „Duplicate“, „Over …“.</p><p><b>Lösen:</b> Jede Seite bekommt einen einzigartigen, präzisen Title und eine klare Beschreibung, ohne Keyword-Stuffing.</p></details>
+<details class="f"><summary>Problem 4: Wichtige Seite ist nicht indexierbar</summary><p><b>Erkennen:</b> Reiter „Internal“: Spalte zur Indexierbarkeit zeigt „Non-Indexable“ mit Grund.</p><p><b>Prüfen:</b> noindex gesetzt? Canonical zeigt auf eine andere URL? Blockiert robots.txt? Statuscode nicht 200?</p><p><b>Lösen:</b> Ursache beheben, danach in der Search Console die URL prüfen.</p></details>
+<details class="f"><summary>Problem 5: Bilder ohne Alt-Text, H1 fehlt</summary><p><b>Erkennen:</b> Reiter „Images“ bzw. „H1“.</p><p><b>Lösen:</b> Alt-Text ergänzen, wenn das Bild inhaltlich wichtig ist; pro Seite eine klare H1.</p></details>
+<div class="tip"><b>Merksatz:</b> Screaming Frog liefert keine „Note“, sondern eine <i>Fehlerliste</i>. Eure Aufgabe: Zahlen lesen → Ursache verstehen → Maßnahme ableiten.</div>
+<h3>Kann die Seite gut von KI-Systemen verarbeitet werden?</h3>
+<p>Das ist die Frage aus eurer Übung. Ein sinnvoller Anfang mit Screaming Frog: Sind alle wichtigen Seiten erreichbar (200), indexierbar, mit klarem Title, H1 und Überschriftenstruktur? Was der Crawler nicht sauber lesen kann, kann auch eine KI kaum sauber zitieren.</p>
+</section>
+
+<section id="sistrix" class="sis" data-t="4 · Sistrix" hidden>
+<h2 style="color:var(--sis)">Sistrix</h2>
+<p class="lead">Ein SEO-Tool, das vor allem für den <b>Sichtbarkeitsindex</b> bekannt ist. Es misst, wie gut eine Domain bei Google sichtbar ist, und gilt als Standard im DACH-Raum.</p>
+<h3>Der Sichtbarkeitsindex</h3>
+<p>Eine nach oben offene Skala: Sie zeigt, wie häufig und wie weit vorne eine Domain bei Google auftaucht. <b>Nicht die absolute Zahl zählt, sondern die Entwicklung und der Vergleich mit Mitbewerbern.</b> Er wird täglich aktualisiert und basiert auf tausenden Keywords, also ein Frühwarnsystem.</p>
+<div class="scale">
+<div><strong>≈ 0,5</strong><br>ein kleiner Blog</div>
+<div><strong>> 1.000</strong><br>großes Nachrichtenportal wie Spiegel.de</div>
+<div><strong>Verlauf</strong><br>Steigt oder fällt die Linie? Und die der Konkurrenz?</div>
+</div>
+<div class="tip s"><b>Eselsbrücke:</b> Wie ein Fieberthermometer. Die Zahl allein sagt wenig, der Verlauf sagt viel. Ein plötzlicher Einbruch weist auf technische Fehler, Google-Updates oder Content-Probleme hin.</div>
+<h3>So geht ihr vor</h3>
+<ol class="steps">
+<li><b>Zugang klären</b> (Login über die Vorlesung bzw. Dozent:in).</li>
+<li><b>Domain eingeben</b> in die Suche des Tools, z. B. <code>beispiel.de</code>.</li>
+<li><b>Sichtbarkeitsindex ansehen:</b> Wie ist der Verlauf über Wochen und Monate? Gibt es Knicke?</li>
+<li><b>Konkurrenten hinzufügen</b> und vergleichen: Sinkt nur ihr oder der ganze Markt?</li>
+<li><b>Tiefer graben:</b> Keywords, Verzeichnisse und SERP-Features anschauen (Tabelle unten).</li>
+</ol>
+<div class="tip w">Die genauen Menünamen in Sistrix ändern sich. Sucht nach dem Thema (Sichtbarkeitsindex, Keywords, Wettbewerber, SERP-Features) und schaut in die offiziellen Sistrix-Tutorials.</div>
+<h3>Was kann man analysieren?</h3>
+<div class="tblw"><table>
+<tr><th>Bereich</th><th>Frage dahinter</th></tr>
+<tr><td>Keyword-Rankings</td><td>Welche Begriffe bringen Besucher? Wo rankt mein Content?</td></tr>
+<tr><td>Wettbewerbsvergleich</td><td>Wie sichtbar bin ich im Vergleich zu anderen?</td></tr>
+<tr><td>SERP-Features</td><td>Wie und wo wird mein Content bei Google gezeigt (z. B. „Übersichten mit KI“)?</td></tr>
+<tr><td>Verzeichnisebene</td><td>Welcher Bereich (z. B. /blog/ oder /produkte/) läuft gut oder schlecht?</td></tr>
+<tr><td>Mobile vs. Desktop</td><td>Unterscheidet sich die Sichtbarkeit nach Endgerät?</td></tr>
+</table></div>
+<h3>Sistrix und GEO: Übersichten mit KI</h3>
+<p>Im Bericht zu SERP-Features lässt sich filtern, welche Seiten einer Website in den „Übersichten mit KI“ erscheinen und welche nicht. Ihr könnt also vergleichen: <b>Welche eigenen Inhalte zitiert Googles KI, und welche Mitbewerber tauchen dort auf?</b></p>
+<h3>Problem-Landkarte</h3>
+<details class="s"><summary>Der Index bricht plötzlich ein</summary><p><b>Prüfen:</b> (1) Technischer Fehler? Website mit Screaming Frog crawlen, Search Console prüfen. (2) Google-Update? Zeitpunkt des Knicks mit bekannten Updates vergleichen. (3) Content-Probleme? Verzeichnisse ansehen: Bricht nur ein Bereich ein?</p><p><b>Tipp:</b> Sinken auch die Konkurrenten, liegt es eher am Markt/Update als an euch.</p></details>
+<details class="s"><summary>Der Index stagniert</summary><p><b>Prüfen:</b> Für welche Keywords rankt ihr, und wo sind Konkurrenten besser? Fehlen Inhalte zu wichtigen Suchbegriffen?</p></details>
+<details class="s"><summary>Konkurrent taucht in KI-Antworten auf, ihr nicht</summary><p><b>Prüfen:</b> SERP-Features-Bericht, Filter „Übersichten mit KI“. Danach die Inhalte der Konkurrenz ansehen: klare Antworten, gute Struktur, Erwähnungen auf vertrauenswürdigen Seiten?</p></details>
+<details class="s"><summary>Mobil schlechter als Desktop</summary><p><b>Prüfen:</b> Ist die mobile Darstellung vollständig und schnell? Wichtige Inhalte dürfen nicht nur auf Desktop existieren.</p></details>
+</section>
+
+<section id="zusammen" data-t="5 · Zusammenspiel" hidden>
+<h2>Wie die Tools zusammenarbeiten</h2>
+<p class="lead">Sistrix sagt <b>dass</b> etwas passiert (Sichtbarkeit steigt oder fällt). Screaming Frog und die Search Console helfen zu klären, <b>warum</b>.</p>
+<div class="tblw"><table>
+<tr><th>Symptom</th><th>Erst schauen in</th><th>Dann</th><th>Mögliche Maßnahme</th></tr>
+<tr><td>Sichtbarkeit fällt plötzlich</td><td>Sistrix (Zeitpunkt, Verzeichnis, Konkurrenz)</td><td>Screaming Frog (Fehler?), Search Console (Indexierung?)</td><td>Technischen Fehler beheben, Inhalte prüfen</td></tr>
+<tr><td>Seite taucht bei Google gar nicht auf</td><td>Search Console (URL prüfen)</td><td>Screaming Frog (noindex, Canonical, Statuscode)</td><td>Indexierungsblocker entfernen</td></tr>
+<tr><td>Viele Einblendungen, kaum Klicks</td><td>Search Console (CTR)</td><td>Screaming Frog (Title/Description)</td><td>Snippet verbessern</td></tr>
+<tr><td>Klicks da, aber niemand bleibt</td><td>GA4 (Engagement)</td><td>Inhalt und Nutzerführung</td><td>Seite überarbeiten</td></tr>
+<tr><td>Konkurrenz in KI-Antworten, wir nicht</td><td>Sistrix (SERP-Features)</td><td>Screaming Frog (lesbare Struktur), Inhalt</td><td>Klar strukturierte Antworten, Erwähnungen aufbauen</td></tr>
+</table></div>
+<h3>Ein Beispiel-Durchlauf</h3>
+<ol class="steps">
+<li><b>Sistrix:</b> Der Index eines Online-Shops fällt seit drei Wochen. Konkurrenten steigen. Es liegt also an euch.</li>
+<li><b>Sistrix Verzeichnisse:</b> Nur der Bereich /produkte/ bricht ein.</li>
+<li><b>Screaming Frog:</b> Crawl zeigt viele Produktseiten auf noindex oder mit 404.</li>
+<li><b>Search Console:</b> Bestätigt, dass die Seiten nicht mehr indexiert sind.</li>
+<li><b>Maßnahme:</b> Fehler beheben, Sitemap prüfen, Verlauf in Sistrix in den nächsten Wochen beobachten.</li>
+</ol>
+<div class="tip"><b>Super-Merksatz:</b> Sistrix zeigt das Symptom, Screaming Frog die Ursache, die Search Console Googles Sicht, GA4 die Wirkung beim Besucher.</div>
+</section>
+
+<section id="uebung" data-t="6 · Praxisübung" hidden>
+<h2>Die Übung Schritt für Schritt</h2>
+<p>Aufgabe aus der Vorlesung: eine Website eurer Wahl in Sistrix und Screaming Frog prüfen, Gemini/ChatGPT befragen und die Ergebnisse in einem Dokument festhalten.</p>
+<ol class="steps">
+<li><b>Website wählen</b> (am besten klein, unter 500 Seiten).</li>
+<li><b>Screaming Frog:</b> Crawl starten, in „Response Codes“, „Page Titles“, „Meta Description“, „H1“ und „Internal“ (Indexierbarkeit) die Zahlen notieren.</li>
+<li><b>Sistrix:</b> Sichtbarkeitsindex-Verlauf, 1–2 Konkurrenten und den Bericht zu „Übersichten mit KI“ ansehen.</li>
+<li><b>KI befragen</b> (Prompts unten) und mit den echten Tool-Ansichten abgleichen.</li>
+<li><b>Dokument schreiben:</b> Vorlage unten.</li>
+</ol>
+<h3>Prompts für Gemini oder ChatGPT</h3>
+<div class="copy">Erkläre mir als Anfänger Schritt für Schritt: Woran erkenne ich in Screaming Frog und in Sistrix, ob eine Website gut von KI-Systemen verarbeitet werden kann?</div>
+<div class="copy">Wie finde ich in Sistrix heraus, ob Seiten einer Website in Googles „Übersichten mit KI“ (AI Overviews) sichtbar sind? Bitte mit den Menüpunkten, die ich anklicken muss.</div>
+<div class="tip w">KI-Antworten zu Menüpunkten können veraltet oder falsch sein. Prüft jeden Schritt direkt im Tool.</div>
+<h3>Vorlage für euer Dokument</h3>
+<details open><summary>Gliederung</summary><ol>
+<li>Website und Datum der Prüfung</li>
+<li>Screaming Frog: Anzahl URLs, 404-Fehler, Weiterleitungen, fehlende Titles/Descriptions/H1, nicht indexierbare Seiten (mit Zahlen)</li>
+<li>Sistrix: Verlauf des Sichtbarkeitsindex, Vergleich mit Konkurrenz, Ergebnis zu „Übersichten mit KI“</li>
+<li>Bewertung: Ist die Seite gut für KI-Systeme verarbeitbar? Begründung mit den Zahlen</li>
+<li>Drei konkrete Maßnahmen, nach Wichtigkeit sortiert</li></ol></details>
+</section>
+
+<section id="quiz" data-t="7 · Mini-Check" hidden>
+<h2>Prüft euer Verständnis</h2>
+<p>Erst überlegen, dann aufklappen.</p>
+<details><summary>1. Welches Tool nutzt ihr, um kaputte interne Links zu finden?</summary><p>Screaming Frog (Reiter Response Codes, Filter 4xx). Die Inlinks zeigen, wo der Link steht.</p></details>
+<details><summary>2. Was bedeutet ein Sichtbarkeitsindex von 0,5 im Vergleich zu über 1.000?</summary><p>Ein kleiner Blog hat etwa 0,5, ein großes Portal wie Spiegel.de über 1.000. Wichtig ist aber vor allem der Verlauf und der Vergleich mit Konkurrenten, nicht die Zahl allein.</p></details>
+<details><summary>3. Der Sichtbarkeitsindex bricht ein. Was prüft ihr?</summary><p>Technische Fehler (Screaming Frog, Search Console), Google-Updates (Zeitpunkt vergleichen), Content-Probleme (Verzeichnisse). Und: Sinken die Konkurrenten auch?</p></details>
+<details><summary>4. Was ist der Unterschied zwischen robots.txt und noindex?</summary><p>robots.txt steuert das Crawlen, noindex verhindert die Indexierung einer abrufbaren Seite.</p></details>
+<details><summary>5. Warum hilft technisches SEO auch bei GEO?</summary><p>Nur was sauber gefunden und ausgelesen wird, kann ranken und zitiert werden. Ohne Rankings und Erwähnungen verschwindet die Seite aus dem Sichtfeld von KI-Systemen.</p></details>
+</section>
+
+</main>
+<script>
+(function(){
+var secs=[].slice.call(document.querySelectorAll("main>section")),box=document.getElementById("tabs");
+secs.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.dataset.t;b.setAttribute("role","tab");b.onclick=function(){show(s.id,true)};b.dataset.id=s.id;box.appendChild(b)});
+function show(id,push){secs.forEach(function(s){s.hidden=s.id!==id});[].forEach.call(box.children,function(b){b.setAttribute("aria-selected",b.dataset.id===id)});if(push){try{history.replaceState(null,"","#"+id)}catch(e){}}window.scrollTo(0,0)}
+var h=(location.hash||"").slice(1);show(secs.some(function(s){return s.id===h})?h:secs[0].id,false);
+})();
+</script>
+</body>
+</html>
