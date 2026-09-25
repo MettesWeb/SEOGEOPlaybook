@@ -55,6 +55,17 @@ code,.copy{font-family:ui-monospace,Consolas,monospace;font-size:15px;background
 .scale div{flex:1 1 200px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
 .scale strong{font-size:24px;color:var(--sis)}
 @media(max-width:640px){nav button{flex-direction:column;gap:2px;font-size:10px;padding:6px 0}nav button i{font-size:15px}.chain{grid-template-columns:1fr}}
+
+.wb label{display:block;margin:10px 0 2px;font-size:15px;color:var(--mute)}
+.wb input,.wb textarea,.wb select{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.wb textarea{min-height:76px;resize:vertical}
+.wb .road{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:6px;margin:6px 0}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer}
+.btn.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0}.bar div{height:100%;width:0;background:var(--frog)}
+.cnt{font-size:14px;color:var(--mute)}.cnt.ok{color:var(--frog)}.cnt.bad{color:var(--warn)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+@media(max-width:640px){.wb .road{grid-template-columns:1fr;padding:8px 0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
 <body>
@@ -374,6 +385,12 @@ code,.copy{font-family:ui-monospace,Consolas,monospace;font-size:15px;background
 <li>Sistrix: Verlauf des Sichtbarkeitsindex, Vergleich mit Konkurrenz, Ergebnis zu „Übersichten mit KI“</li>
 <li>Bewertung: Ist die Seite gut für KI-Systeme verarbeitbar? Begründung mit den Zahlen</li>
 <li>Drei konkrete Maßnahmen, nach Wichtigkeit sortiert</li></ol></details>
+
+<h2 style="margin-top:40px">Euer Praxis-Workbook: Mini-Audit in 12 Schritten</h2>
+<p class="lead">Hier führt ihr ein komplettes SEO- und GEO-Mini-Audit für eine Website durch. Zu jedem Schritt gibt es Felder für eure Ergebnisse und einen Sprung zum passenden Reiter dieses Playbooks.</p>
+<div class="tip">Der Ablauf orientiert sich am Aufgabenblatt aus der Vorlesung. Aufgaben, Formulierungen und die Verknüpfung mit den Tools im Playbook sind eigenständig erstellt.</div>
+<div class="tip w"><b>Gut zu wissen:</b> Eure Eingaben werden nur in eurem Browser gespeichert, nichts wird gesendet. Bei Gruppenarbeit tippt eine Person, die anderen bekommen das Ergebnis über „Alles kopieren“. KI darf euch helfen, Zahlen kommen aber nur aus den Tools.</div>
+<div class="wb" id="wb"></div>
 </section>
 
 <section id="quiz" data-t="10 · Mini-Check" hidden>
@@ -392,7 +409,55 @@ code,.copy{font-family:ui-monospace,Consolas,monospace;font-size:15px;background
 var secs=[].slice.call(document.querySelectorAll("main>section")),box=document.getElementById("tabs");
 secs.forEach(function(s,i){var b=document.createElement("button");var pp=s.dataset.t.split(" · ");b.innerHTML="<i>"+pp[0]+"</i><span>"+pp[1]+"</span>";b.setAttribute("role","tab");b.onclick=function(){show(s.id,true)};b.dataset.id=s.id;box.appendChild(b)});
 function show(id,push){secs.forEach(function(s){s.hidden=s.id!==id});[].forEach.call(box.children,function(b){b.setAttribute("aria-selected",b.dataset.id===id)});if(push){try{history.replaceState(null,"","#"+id)}catch(e){}}window.scrollTo(0,0)}
-var h=(location.hash||"").slice(1);show(secs.some(function(s){return s.id===h})?h:secs[0].id,false);
+window.goTab=function(i){show(i,true)};var h=(location.hash||"").slice(1);show(secs.some(function(s){return s.id===h})?h:secs[0].id,false);
+})();
+</script>
+
+<script>
+(function(){
+var T={atp:"Gratis-Tool ATP",praxis:"Frog-Praxis",sipraxis:"Sistrix-Praxis"};
+var W=[
+{t:"Unternehmen wählen",i:"Wählt eine echte, überschaubare Website, keinen Konzern.",f:[["firma","Name und URL","text"],["branche","Branche, B2B oder B2C","text"],["angebot","Was wird angeboten, und für wen?","area"],["satz","Ergänzt: „Das Unternehmen hilft ___ dabei, ___.“","area"]]},
+{t:"Suchverhalten und Suchabsicht",tab:"atp",i:"Denkt wie die Zielgruppe: vom Problem über Fragen und Lösungen bis zum Kauf.",f:[["q","Mindestens 8 Suchanfragen, eine pro Zeile","area"],["int","Ordnet jeder Anfrage die Absicht (informieren, vergleichen, kaufen, Marke) und TOFU, MOFU oder BOFU zu","area"],["serp","Sucht 3 Begriffe bei Google: Welche Seitentypen erscheinen (Shops, Ratgeber, Videos, Vergleichsportale)?","area"],["top3","Die 3 wirtschaftlich interessantesten Anfragen","area"]]},
+{t:"Keyword-Recherche",tab:"atp",i:"Von breiten zu spezifischen Suchbegriffen, mit echten Daten aus einem Tool.",f:[["seed","3 Ausgangsbegriffe (Seed-Keywords)","text"],["short","Mindestens 3 breite Keywords (Short Tail)","area"],["long","Mindestens 5 spezifische Keywords (Long Tail): Zielgruppe, Problem, Situation, Kaufabsicht","area"],["daten","Suchvolumen, Schwierigkeit, CPC aus ATP oder Sistrix (nur echte Werte)","area"],["ki","Optional: Welche KI-Ideen habt ihr bei Google oder im Tool bestätigt?","area"]]},
+{t:"Hauptkeyword und Themen-Cluster",i:"Ein Hauptthema, dazu Unterthemen, die sich gegenseitig verlinken.",f:[["prim","Hauptkeyword (Primary Keyword)","text"],["grund","Begründung: Relevanz, Suchabsicht, Geschäftswert, Wettbewerb, kann die Firma gut antworten?","area"],["pillar","Hauptthema","text"],["cluster","Mindestens 5 Unterthemen","area"],["luecken","Welche Inhalte fehlen? Welche Seiten sollten sich verlinken?","area"]]},
+{t:"Technik-Check",tab:"praxis",i:"Kann Google die Seite finden, lesen und aufnehmen? Screaming Frog liefert die Zahlen.",f:[["crawl","Screaming Frog: URLs gesamt, Fehler, Warnungen (Reiter „Probleme“)","area"],["probs","Auffälligkeiten: noindex, Canonical, 404, Weiterleitungen, Titles, H1","area"],["basis","Manuell prüfen: site:domain, /sitemap.xml, /robots.txt, https, mobile Ansicht (je ein Satz)","area"],["speed","PageSpeed Insights mobil: LCP, INP, CLS","text"],["prio","3 Probleme: 1 kritisch, 2 wichtig, 3 sinnvoll, jeweils mit Begründung","area"]]},
+{t:"Sichtbarkeit mit Sistrix",tab:"sipraxis",i:"Wie sichtbar ist die Domain, und wie entwickelt sie sich?",f:[["idx","Sichtbarkeitsindex und Verlauf","text"],["traffic","Trafficschätzung (Zahl und Spanne)","text"],["kw","Keywords in den Top-10 und Top-100","text"],["top","3 Keywords mit Position, Suchvolumen und CPC","area"],["wett","Wichtigste Konkurrenten","text"],["deut","Was fällt auf? Wie erklärt ihr Auf- und Abschwünge?","area"]]},
+{t:"Onpage-Check einer Seite",i:"Eine Seite genau ansehen: Title, Description, Überschriften, Bilder, Links, Handlungsaufforderung.",f:[["seite","Gewählte Seite (URL)","text"],["gut","3 Dinge, die schon gut sind","area"],["opt","Mindestens 5 Optimierungen","area"]]},
+{t:"Autorität und Marke",i:"Was sagt das Netz über das Unternehmen, außerhalb der eigenen Seite?",f:[["erw","Erwähnungen außerhalb der Website (Presse, Portale, Verbände, Interviews)","area"],["ent","Wer ist das Unternehmen, was macht es, für wen, mit welchen Belegen? Ist das schnell erkennbar?","area"],["schema","Welche strukturierten Daten passen (z. B. Organization, Article, Product)?","text"]]},
+{t:"GEO-Test: KI-Antworten prüfen",tab:"sipraxis",i:"Erscheint die Marke in KI-Antworten? Beobachten, nicht vorschnell erklären.",f:[["fr","3 wichtige Fragen aus eurer Keyword-Liste","area"],["sys","Getestet in mindestens 2 Systemen (z. B. Google, ChatGPT, Gemini, Perplexity): genannte Marken und Quellen","area"],["sis","Sistrix: Ergebnis des Filters „AI Overview“ und des AI Checks","area"],["hyp","Vermutungen, warum diese Quellen genannt wurden (eine Beobachtung ist kein Beweis)","area"]]},
+{t:"GEO-Inhalt entwerfen",i:"So baut ihr einen Abschnitt, den eine KI gut zitieren kann.",f:[["h1","H1 (klare Hauptüberschrift)","text"],["quick","Kurzantwort direkt unter der H1","words",[40,60]],["h2","Mindestens 4 sinnvolle H2","area"],["faq","3 echte Nutzerfragen mit kurzer Antwort","area"],["evid","Mindestens 1 Beleg (Studie, eigene Daten, Erfahrung, Test)","area"],["trust","Vertrauenselemente: Autor, Quellen, Datum, Firmenangaben","area"]]},
+{t:"Roadmap: Top 5 Maßnahmen",road:1,i:"Was zuerst? Sortiert nach Wirkung und Aufwand und legt fest, woran ihr den Erfolg messt."},
+{t:"Empfehlung an den Kunden",i:"Der Kunde fragt: „SEO oder GEO?“ Begründet mit euren Ergebnissen.",f:[["emp","Eure Antwort, maximal 150 Wörter","words",[1,150]],["refl","Was war neu, was hat überrascht, was würdet ihr zuerst beheben?","area"]]}
+];
+var KEY="seogeo-workbook-v1",V={};try{V=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(V))}catch(e){}}
+var root=document.getElementById("wb");if(!root)return;
+var P=["Quick Win","Strategisch","Dauerhaft"],A=["gering","mittel","hoch"],ups=[];
+function words(s){return (s||"").trim().split(/\s+/).filter(Boolean).length}
+function keys(s,n){var k=[];if(s.road){for(var r=0;r<5;r++)k.push("r"+n+"_"+r+"m")}else s.f.forEach(function(x){k.push(x[0])});return k}
+function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
+function field(lbl,key,type,opt){var w=mk("div");var l=mk("label",0,lbl);w.appendChild(l);var e=type==="text"?mk("input"):mk("textarea");e.value=V[key]||"";var c;
+if(type==="words"){c=mk("div","cnt");w.appendChild(e);w.appendChild(c)}else w.appendChild(e);
+function upd(){if(c){var n=words(e.value);c.textContent=n+" Wörter (Ziel: "+(opt[0]>1?opt[0]+" bis ":"höchstens ")+opt[1]+")";c.className="cnt "+((n>=opt[0]&&n<=opt[1])?"ok":(n?"bad":""))}}
+e.addEventListener("input",function(){V[key]=e.value;save();upd();up()});upd();return w}
+function sel(o,key){var s=mk("select");var d=mk("option",0,"wählen");d.value="";s.appendChild(d);o.forEach(function(x){var q=mk("option",0,x);q.value=x;s.appendChild(q)});s.value=V[key]||"";s.addEventListener("change",function(){V[key]=s.value;save()});return s}
+function inp(ph,key){var e=mk("input");e.placeholder=ph;e.value=V[key]||"";e.addEventListener("input",function(){V[key]=e.value;save();up()});return e}
+var bar=mk("div","bar"),bi=mk("div");bar.appendChild(bi);var pt=mk("div","cnt");
+var acts=mk("div","acts");
+function btn(t,cls,fn){var b=mk("button","btn "+(cls||""),t);b.type="button";b.onclick=fn;acts.appendChild(b)}
+function dump(){var o=["SEO & GEO Mini-Audit\n"];W.forEach(function(s,n){o.push("## "+(n+1)+". "+s.t);if(s.road){for(var r=0;r<5;r++){var m=V["r"+n+"_"+r+"m"];if(m)o.push("- "+m+" | Priorität: "+(V["r"+n+"_"+r+"p"]||"-")+" | Aufwand: "+(V["r"+n+"_"+r+"a"]||"-")+" | KPI: "+(V["r"+n+"_"+r+"k"]||"-"))}}else s.f.forEach(function(x){if(V[x[0]])o.push(x[1]+"\n"+V[x[0]])});o.push("")});return o.join("\n")}
+btn("Alles kopieren","p",function(){var t=dump();if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){this.textContent="Kopiert"}.bind(this),fb)}else fb();function fb(){var x=mk("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(x)}});
+btn("Als Textdatei speichern","",function(){var a=mk("a");a.href=URL.createObjectURL(new Blob([dump()],{type:"text/plain;charset=utf-8"}));a.download="seo-geo-mini-audit.txt";document.body.appendChild(a);a.click();document.body.removeChild(a)});
+btn("Alles löschen","",function(){if(confirm("Alle Eingaben löschen?")){V={};save();location.reload()}});
+root.appendChild(pt);root.appendChild(bar);root.appendChild(acts);
+W.forEach(function(s,n){var d=mk("details"),sm=mk("summary");d.appendChild(sm);var b=mk("div");b.style.paddingBottom="12px";b.appendChild(mk("p",0,s.i));
+if(s.tab){var g=mk("button","btn","Hilfe im Reiter „"+T[s.tab]+"“");g.type="button";g.onclick=function(){window.goTab(s.tab)};b.appendChild(g)}
+if(s.road){for(var r=0;r<5;r++){(function(r){var row=mk("div","road");row.appendChild(inp("Maßnahme "+(r+1),"r"+n+"_"+r+"m"));row.appendChild(sel(P,"r"+n+"_"+r+"p"));row.appendChild(sel(A,"r"+n+"_"+r+"a"));row.appendChild(inp("Erfolgs-Kennzahl","r"+n+"_"+r+"k"));b.appendChild(row)})(r)}}
+else s.f.forEach(function(x){b.appendChild(field(x[1],x[0],x[2]==="text"?"text":(x[2]==="words"?"words":"area"),x[3]))});
+d.appendChild(b);root.appendChild(d);ups.push(function(){var k=keys(s,n),c=k.filter(function(x){return (V[x]||"").trim()}).length;sm.textContent=(c===k.length?"✓ ":"")+(n+1)+". "+s.t+" ("+c+"/"+k.length+")";return [c,k.length]})});
+function up(){var a=0,t=0;ups.forEach(function(f){var r=f();a+=r[0];t+=r[1]});bi.style.width=(t?Math.round(100*a/t):0)+"%";pt.textContent=a+" von "+t+" Feldern ausgefüllt"}
+up();
 })();
 </script>
 </body>
